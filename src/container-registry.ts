@@ -7,12 +7,14 @@ import {
     RoundResultConsumer,
     UnsettledRoundConsumer,
     SettleGameRoundConsumer,
+    GameResultServiceConsumer,
 } from "./consumers";
 
 import { Bot, GameCron, ProcessBetQueue } from "./crons";
 import { betLogs, bets, results, rounds, tmpBets, tournaments } from "./models";
 import { RunningRoundInfoPublisher } from "./publishers";
 import { HistoryQuery } from "./query-apis";
+import { SocketRouter } from "./sockets";
 
 export default class ContainerRegistry extends Table.TableContainerRegistry {
     register(appConfigs: any, definition: any, gameData: any): AwilixContainer<any> {
@@ -54,6 +56,7 @@ export default class ContainerRegistry extends Table.TableContainerRegistry {
             roundResultConsumer: asClass(RoundResultConsumer).singleton().proxy(),
             unsettledRoundConsumer: asClass(UnsettledRoundConsumer).singleton().proxy(),
             settleGameRoundConsumer: asClass(SettleGameRoundConsumer).singleton().proxy(),
+            gameResultServiceConsumer: asClass(GameResultServiceConsumer).singleton().proxy(),
         });
     }
 
@@ -70,6 +73,13 @@ export default class ContainerRegistry extends Table.TableContainerRegistry {
 
         this.container.register({
             historyQuery: asClass(HistoryQuery).singleton(),
+        });
+    }
+
+    registerRouters() {
+        super.registerRouters();
+        this.container.register({
+            socketRouter: asClass(SocketRouter).proxy(),
         });
     }
 }
