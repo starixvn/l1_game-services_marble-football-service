@@ -69,12 +69,18 @@ describe("RoundResultConsumer", () => {
         it("should return matchConfig from gameData", () => {
             // arrange
             gameData.gameConfigs.randomMode = 1;
+            gameData.gameConfigs.videoStreamConfig = {
+                videoInfos: [
+                    { videoName: "HAA", numberOfVideos: 1 },
+                    { videoName: "AHH", numberOfVideos: 2 },
+                ],
+            };
 
             // act
             const data = roundResultConsumer.getDataForGenerateResult();
 
             // assert
-            expect(data).toEqual({ randomMode: 1 });
+            expect(data).toEqual({ randomMode: 1, numberOfVideos: { HAA: 1, AHH: 2 } });
         });
     });
 
@@ -132,11 +138,22 @@ describe("RoundResultConsumer", () => {
             });
 
             it("should call generateResultFromAdminRawResult", () => {
+                // Arrange
+                gameData.gameConfigs.videoStreamConfig = {
+                    videoInfos: [
+                        { videoName: "HAA", numberOfVideos: 1 },
+                        { videoName: "AHH", numberOfVideos: 2 },
+                    ],
+                };
+
                 // Act
                 roundResultConsumer.generateResultFromAdmin();
 
                 // Assert
-                expect(ResultHelper.generateResultFromAdminRawResult).toHaveBeenCalledWith(gameData.settlementResultFromAdmin.result);
+                expect(ResultHelper.generateResultFromAdminRawResult).toHaveBeenCalledWith(gameData.settlementResultFromAdmin.result, {
+                    HAA: 1,
+                    AHH: 2,
+                });
             });
         });
 

@@ -3,6 +3,7 @@ import GameData from "../game-data";
 import type TournamentConsumer from "./tournament-consumer";
 import { resultHelper } from "../helpers";
 import { encrypt } from "sc-game-base/src/core/helpers/crypto-helper";
+import { DEFAULT_NUMBER_OF_VIDEOS } from "../constants";
 export default class RoundResultConsumer extends RoundResultConsumerBase {
     declare gameData: GameData;
     tournamentConsumer: TournamentConsumer;
@@ -19,9 +20,20 @@ export default class RoundResultConsumer extends RoundResultConsumerBase {
         this.tournamentConsumer = container.tournamentConsumer;
     }
 
+    getNumberOfVideos = () => {
+        const numberOfVideos = this.gameData.gameConfigs.videoStreamConfig?.videoInfos.reduce((acc, video) => {
+            acc[video.videoName] = video.numberOfVideos;
+            return acc;
+        }, {} as Record<string, number>);
+
+        return numberOfVideos || DEFAULT_NUMBER_OF_VIDEOS;
+    };
+
     override getDataForGenerateResult() {
         const { randomMode } = this.gameData.gameConfigs;
-        return { randomMode };
+        const numberOfVideos = this.getNumberOfVideos();
+
+        return { randomMode, numberOfVideos };
     }
 
     override async generateResult() {
@@ -34,9 +46,10 @@ export default class RoundResultConsumer extends RoundResultConsumerBase {
 
     override generateResultFromAdmin() {
         const { roundId, settlementResultFromAdmin: resultFromAdmin } = this.gameData;
+        const numberOfVideos = this.getNumberOfVideos();
 
         if (roundId === resultFromAdmin.roundId) {
-            this.gameData.result = resultHelper.generateResultFromAdminRawResult(resultFromAdmin.result);
+            this.gameData.result = resultHelper.generateResultFromAdminRawResult(resultFromAdmin.result, numberOfVideos);
             return true;
         }
 

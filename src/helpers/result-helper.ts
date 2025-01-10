@@ -3,21 +3,23 @@ import { ResultType, SettlementResultType } from "../models/rounds";
 import Chance from "chance";
 import { shuffle } from "./shuffle";
 import crypto from "crypto";
-import { NUMBER_OF_VIDEOS, POOL_SIZE } from "../constants";
+import { DEFAULT_NUMBER_OF_VIDEOS, POOL_SIZE } from "../constants";
 import { randomHelper } from ".";
 
 type DataResultType = {
     randomMode: number;
+    numberOfVideos: Record<string, number>;
     pool?: string[];
 };
 export const generateResult = (data: DataResultType): ResultType => {
     const chance = new Chance();
     const pool = data.pool || createScorePool(halfConfig, POOL_SIZE);
     const randomMode = data.randomMode || 1;
+    const numberOfVideos = data.numberOfVideos || DEFAULT_NUMBER_OF_VIDEOS;
 
-    const firstHalf = generateResultForHalf({ randomMode, pool });
-    const secondHalf = generateResultForHalf({ randomMode, pool });
-    const videoInfo = getVideoInfoFromResult(firstHalf, secondHalf);
+    const firstHalf = generateResultForHalf({ randomMode, numberOfVideos, pool });
+    const secondHalf = generateResultForHalf({ randomMode, numberOfVideos, pool });
+    const videoInfo = getVideoInfoFromResult(firstHalf, secondHalf, numberOfVideos);
     const homeWinsOnDraw = chance.bool();
     const penalty = generatePenaltyResult(homeWinsOnDraw);
 
@@ -31,10 +33,10 @@ export const generateResult = (data: DataResultType): ResultType => {
     };
 };
 
-export const generateResultFromAdminRawResult = (roundResult: ResultType): ResultType => {
+export const generateResultFromAdminRawResult = (roundResult: ResultType, numberOfVideos: Record<string, number>): ResultType => {
     const firstHalf = roundResult.firstHalf || "0";
     const secondHalf = roundResult.secondHalf || "0";
-    const videoInfo = getVideoInfoFromResult(firstHalf, secondHalf);
+    const videoInfo = getVideoInfoFromResult(firstHalf, secondHalf, numberOfVideos);
     const penalty = generatePenaltyResult(roundResult.homeWinsOnDraw);
 
     return {
@@ -94,9 +96,9 @@ const getScoreFromPool = (data: DataResultType) => {
     return pool[index];
 };
 
-const getVideoInfoFromResult = (firstHalf: string, secondHalf: string) => {
-    const firstHalfVideo = generateVideoName(firstHalf);
-    const secondHalfVideo = generateVideoName(secondHalf, false, firstHalfVideo);
+const getVideoInfoFromResult = (firstHalf: string, secondHalf: string, numberOfVideos: Record<string, number>) => {
+    const firstHalfVideo = generateVideoName(firstHalf, numberOfVideos);
+    const secondHalfVideo = generateVideoName(secondHalf, numberOfVideos, false, firstHalfVideo);
 
     return {
         firstHalfVideo,
@@ -104,14 +106,14 @@ const getVideoInfoFromResult = (firstHalf: string, secondHalf: string) => {
     };
 };
 
-export const generateVideoName = (result: string, videoDefault = false, ignoredVideo = "") => {
+export const generateVideoName = (result: string, numberOfVideos: Record<string, number>, videoDefault = false, ignoredVideo = "") => {
     const chance = new Chance();
-    const numberOfVideos = NUMBER_OF_VIDEOS[result] || 1;
-    let videoIndex = videoDefault ? 0 : chance.integer({ min: 1, max: numberOfVideos }) - 1;
+    const currentNumberOfVideos = numberOfVideos[result] || DEFAULT_NUMBER_OF_VIDEOS[result];
+    let videoIndex = videoDefault ? 0 : chance.integer({ min: 1, max: currentNumberOfVideos }) - 1;
     let videoName = crypto.createHash("sha256").update(`${result}-${videoIndex}`).digest("hex");
 
     if (videoName === ignoredVideo && !videoDefault) {
-        videoIndex = (videoIndex + 1) % numberOfVideos;
+        videoIndex = (videoIndex + 1) % currentNumberOfVideos;
         videoName = crypto.createHash("sha256").update(`${result}-${videoIndex}`).digest("hex");
     }
 

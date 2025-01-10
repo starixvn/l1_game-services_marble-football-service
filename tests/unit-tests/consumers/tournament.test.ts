@@ -3,7 +3,7 @@ import appConfigs from "../../../src/app-configs";
 import { TournamentConsumer } from "../../../src/consumers";
 import GameData from "../../../src/game-data";
 import { roundsRepository, tournamentRepository } from "../global-stubs";
-import { TOURNAMENT_CODES } from "../../../src/constants";
+import { DEFAULT_TOURNAMENT_CODES } from "../../../src/constants";
 
 describe(TournamentConsumer.name, () => {
     let consumer: TournamentConsumer;
@@ -68,7 +68,7 @@ describe(TournamentConsumer.name, () => {
 
             // Assert
             expect(tournamentRepository.create).toHaveBeenCalledWith({
-                code: TOURNAMENT_CODES.code,
+                code: DEFAULT_TOURNAMENT_CODES.code,
                 matches: expect.any(Array),
                 currentMatch: 0,
                 ended: false,

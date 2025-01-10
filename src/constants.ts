@@ -14,7 +14,7 @@ export const IS_DEV_ENV = process.env.NODE_ENV === "development";
 
 export const POOL_SIZE = 10_000;
 
-export const NUMBER_OF_VIDEOS: Record<string, number> = {
+export const DEFAULT_NUMBER_OF_VIDEOS: Record<string, number> = {
     AAAA: 9,
     AAAH: 10,
     AAA: 30,
@@ -48,7 +48,7 @@ export const NUMBER_OF_VIDEOS: Record<string, number> = {
     "0": 130,
 };
 
-export const TOURNAMENT_CODES = {
+export const DEFAULT_TOURNAMENT_CODES = {
     code: "UCL",
     teams: ["MCI", "RMA", "BAR", "LIV", "ARS", "FCB", "INT", "LEV", "AVL", "ATA", "BVB", "JUV", "PSG", "SLB", "ATM", "MIL"],
 };

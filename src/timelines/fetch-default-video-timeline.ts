@@ -1,6 +1,6 @@
 // NOSONAR
 
-import { NUMBER_OF_VIDEOS } from "../constants";
+import { DEFAULT_NUMBER_OF_VIDEOS } from "../constants";
 import appConfigs from "../app-configs";
 import { generateVideoName } from "../helpers/result-helper";
 import fs from "fs";
@@ -42,8 +42,8 @@ async function getVideoTimeline(videoName: string): Promise<number[]> {
 async function fetchDefaultVideoTimelines() {
     const videoTimelines = {} as Record<string, number[]>;
 
-    for (const key in NUMBER_OF_VIDEOS) {
-        const videoName = generateVideoName(key, true);
+    for (const key in DEFAULT_NUMBER_OF_VIDEOS) {
+        const videoName = generateVideoName(key, {}, true);
         const timeline = await getVideoTimeline(videoName);
         videoTimelines[`${videoName}_${key}`] = timeline;
     }

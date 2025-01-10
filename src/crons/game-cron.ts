@@ -75,7 +75,8 @@ export default class GameCron extends Table.Crons.TableGameCron {
     }
 
     getDefaultVideoTimeline(result: string, isFirstHalf: boolean) {
-        const videoName = generateVideoName(result, true);
+        const videoName = generateVideoName(result, {}, true);
+
         if (isFirstHalf) {
             this.gameData.result.firstHalfVideo = videoName;
         } else {
