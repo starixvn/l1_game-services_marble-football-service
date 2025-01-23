@@ -10,11 +10,5 @@ export const modifyM3U8 = (m3u8Content: string, mediaSequence: number) => {
 export const generateLoopFile = (baseUrl: string, fileName: string, mediaSequence: number) => {
     const encryptionKey = new URL("encryption.key", baseUrl).toString();
     const fileUrl = new URL(fileName, baseUrl).toString();
-    return `#EXTM3U
-    #EXT-X-VERSION:3
-    #EXT-X-MEDIA-SEQUENCE:${mediaSequence}
-    #EXT-X-KEY:METHOD=AES-128,URI=${encryptionKey}
-    #EXT-X-TARGETDURATION:11
-    #EXTINF:
-    ${fileUrl}`;
+    return `#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-MEDIA-SEQUENCE:${mediaSequence}\n#EXT-X-KEY:METHOD=AES-128,URI=${encryptionKey}\n#EXT-X-TARGETDURATION:11\n#EXTINF:\n${fileUrl}`;
 };
