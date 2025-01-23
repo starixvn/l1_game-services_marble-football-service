@@ -13,6 +13,7 @@ import { Bot, GameCron, ProcessBetQueue } from "./crons";
 import { betLogs, bets, results, rounds, tmpBets, tournaments } from "./models";
 import { RunningRoundInfoPublisher } from "./publishers";
 import { HistoryQuery } from "./query-apis";
+import { HttpRouter } from "./routers";
 
 export default class ContainerRegistry extends Table.TableContainerRegistry {
     register(appConfigs: any, definition: any, gameData: any): AwilixContainer<any> {
@@ -70,6 +71,14 @@ export default class ContainerRegistry extends Table.TableContainerRegistry {
 
         this.container.register({
             historyQuery: asClass(HistoryQuery).singleton(),
+        });
+    }
+
+    registerRouters() {
+        super.registerRouters();
+
+        this.container.register({
+            httpRouter: asClass(HttpRouter),
         });
     }
 }
