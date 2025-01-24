@@ -20,7 +20,6 @@ export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: 
         }
     }
     configLines.push(`#EXT-X-START:TIME-OFFSET=${timeToStart}`);
-    configLines.push(`#EXT-X-ALLOW-CACHE:YES`);
     configLines.push(`#EXT-X-INDEPENDENT-SEGMENTS`);
     const contentLines: string[] = [];
     for (let i = contentIndex; i < lines.length; i += 2) {
@@ -42,7 +41,7 @@ export const generateLoopFile = (baseUrl: string, fileName: string, mediaSequenc
 #EXT-X-MEDIA-SEQUENCE:${mediaSequence}
 #EXT-X-KEY:METHOD=AES-128,URI=${encryptionKey}
 #EXT-X-TARGETDURATION:3
-#EXT-X-INDEPENDENT-SEGMENTS
+#EXT-X-DISCONTINUITY
 #EXTINF:2.033333
 ${fileUrl}`;
 };
