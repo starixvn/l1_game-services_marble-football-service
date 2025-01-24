@@ -48,8 +48,10 @@ export class HttpRouter extends TableHttpRouter {
             m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, 0, timeToStart);
         } else {
             if (mediaSequenceFlag) {
+                mediaSequenceFlag = false;
                 m3u8Content = generatePlaylist();
             } else {
+                mediaSequenceFlag = true;
                 m3u8Content = generateLoopFile(this.appConfigs.liveStreamServer, `${VIDEO_DEFAULT}_${resolution}0.ts`, 0);
             }
         }
