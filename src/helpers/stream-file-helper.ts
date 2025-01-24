@@ -24,6 +24,7 @@ export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: 
         }
     }
     configLines.push(`#EXT-X-START:TIME-OFFSET=${timeToStart}`);
+    configLines.push(`#EXT-X-ALLOW-CACHE:YES`);
     const contentLines: string[] = [];
     for (let i = contentIndex; i < lines.length; i += 2) {
         if (lines[i].includes(END_FLAG_M3U8)) {
@@ -39,7 +40,15 @@ export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: 
 export const generateLoopFile = (baseUrl: string, fileName: string, mediaSequence: number) => {
     const encryptionKey = new URL("encryption.key", baseUrl).toString();
     const fileUrl = new URL(fileName, baseUrl).toString();
-    return `#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-MEDIA-SEQUENCE:${mediaSequence}\n#EXT-X-KEY:METHOD=AES-128,URI=${encryptionKey}\n#EXT-X-TARGETDURATION:11\n#EXTINF:\n${fileUrl}`;
+    return `#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-MEDIA-SEQUENCE:${mediaSequence}
+#EXT-X-KEY:METHOD=AES-128,URI=${encryptionKey}
+#EXT-X-TARGETDURATION:2
+#EXT-X-ALLOW-CACHE:YES
+#EXT-X-START:TIME-OFFSET=0
+#EXTINF:2.033333
+${fileUrl}`;
 };
 
 export const generatePlaylist = () => {
