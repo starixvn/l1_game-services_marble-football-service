@@ -16,6 +16,7 @@ export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: 
         if (lines[i].includes(KEY_FLAG_M3U8)) {
             configLines.push(`${KEY_FLAG_M3U8}:METHOD=AES-128,URI=${new URL("encryption.key", baseUrl).toString()}`);
         } else if (lines[i].includes(MEDIA_SEQUENCE_FLAG_M3U8)) {
+            configLines.push(`${MEDIA_SEQUENCE_FLAG_M3U8}:${mediaSequence}`);
         } else {
             configLines.push(lines[i]);
         }
@@ -37,7 +38,6 @@ export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: 
             flag = true;
         }
     }
-    configLines.push(`#EXT-X-MEDIA-SEQUENCE:${chooseSegmentIndex}`);
     configLines.push(`#EXT-X-START:TIME-OFFSET=${timeOffset}`);
     configLines.push(`#EXT-X-DISCONTINUITY`);
     const segmentToPlay = segment.slice(
