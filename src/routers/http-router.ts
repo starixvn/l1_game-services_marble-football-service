@@ -28,7 +28,7 @@ export class HttpRouter extends TableHttpRouter {
     }
 
     async handleLiveStream(res: any, resolution: string = "720p") {
-        const { remainingTime } = this.gameData;
+        const { remainingTime, roundId } = this.gameData;
         const { durations } = this.definition;
         const mediaSequence = MEDIA_SEQUENCE_MAX - remainingTime;
         const isStreamingVideo = remainingTime < durations.streamingVideo && remainingTime >= 0;
@@ -40,16 +40,16 @@ export class HttpRouter extends TableHttpRouter {
                 m3u8Content = await fetch(
                     new URL(`${this.gameData.result.firstHalfVideo}_${resolution}.m3u8`, this.appConfigs.liveStreamServer).toString()
                 ).then((res) => res.text());
-                m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, 1, timeToStart);
+                m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, roundId * 3 + 1, timeToStart);
             } else {
                 m3u8Content = await fetch(
                     new URL(`${this.gameData.result.secondHalfVideo}_${resolution}.m3u8`, this.appConfigs.liveStreamServer).toString()
                 ).then((res) => res.text());
                 timeToStart = durations.streamingVideo - 53 - remainingTime;
-                m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, 2, timeToStart);
+                m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, roundId * 3 + 2, timeToStart);
             }
         } else {
-            m3u8Content = generateLoopFile(this.appConfigs.liveStreamServer, `${VIDEO_DEFAULT}_${resolution}0.ts`, mediaSequence);
+            m3u8Content = generateLoopFile(this.appConfigs.liveStreamServer, `${VIDEO_DEFAULT}_${resolution}0.ts`, roundId * 3);
         }
 
         res.setHeader("Content-Type", STREAM_MIME_TYPE);
