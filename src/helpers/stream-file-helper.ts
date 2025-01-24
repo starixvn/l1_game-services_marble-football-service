@@ -13,12 +13,8 @@ export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: 
             contentIndex = i;
             break;
         }
-        if (lines[i].includes(MEDIA_SEQUENCE_FLAG_M3U8)) {
-            configLines.push(`${MEDIA_SEQUENCE_FLAG_M3U8}:${mediaSequence}`);
-        } else if (lines[i].includes(KEY_FLAG_M3U8)) {
+        if (lines[i].includes(KEY_FLAG_M3U8)) {
             configLines.push(`${KEY_FLAG_M3U8}:METHOD=AES-128,URI=${new URL("encryption.key", baseUrl).toString()}`);
-        } else if (lines[i].includes(TARGET_DURATION_FLAG_M3U8)) {
-            configLines.push(`${TARGET_DURATION_FLAG_M3U8}:50`);
         } else {
             configLines.push(lines[i]);
         }
