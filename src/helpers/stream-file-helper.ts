@@ -1,10 +1,31 @@
-const END_FLAG_M3U8 = "#EXT-X-ENDLIST";
-const START_FLAG_M3U8 = "#EXTM3U";
+const SEGMENT_FLAG_M3U8 = "#EXTINF";
+const MEDIA_SEQUENCE_FLAG_M3U8 = "#EXT-X-MEDIA-SEQUENCE";
+const KEY_FLAG_M3U8 = "#EXT-X-KEY";
 
-export const modifyM3U8 = (m3u8Content: string, mediaSequence: number) => {
-    m3u8Content = m3u8Content.replace(END_FLAG_M3U8, "");
-    m3u8Content = m3u8Content.replace(START_FLAG_M3U8, `${START_FLAG_M3U8}\n#EXT-X-MEDIA-SEQUENCE:${mediaSequence}`);
-    return m3u8Content;
+export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: number, timeToStart: number) => {
+    const lines = m3u8Content.split("\n");
+    const configLines = [];
+    let contentIndex = 0;
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes(SEGMENT_FLAG_M3U8)) {
+            contentIndex = i;
+            break;
+        }
+        if (lines[i].includes(MEDIA_SEQUENCE_FLAG_M3U8)) {
+            configLines.push(`${MEDIA_SEQUENCE_FLAG_M3U8}:${mediaSequence}`);
+        }
+        if (lines[i].includes(KEY_FLAG_M3U8)) {
+            configLines.push(`${KEY_FLAG_M3U8}:METHOD=AES-128,URI=${new URL("encryption.key", baseUrl).toString()}`);
+        }
+    }
+    configLines.push(`#EXT-X-START:TIME-OFFSET=${timeToStart}`);
+    const contentLines: string[] = [];
+    for (let i = contentIndex; i < lines.length; i += 2) {
+        contentLines.push(lines[i]);
+        contentLines.push(new URL(lines[i + 1], baseUrl).toString());
+    }
+
+    return [...configLines, ...contentLines].join("\n");
 };
 
 export const generateLoopFile = (baseUrl: string, fileName: string, mediaSequence: number) => {
