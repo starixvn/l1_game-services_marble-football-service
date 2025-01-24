@@ -53,9 +53,10 @@ export const generateLoopFile = (baseUrl: string, fileName: string, mediaSequenc
     return `#EXTM3U
 #EXT-X-VERSION:3
 #EXT-X-KEY:METHOD=AES-128,URI=${encryptionKey}
+#EXT-X-MEDIA-SEQUENCE:${mediaSequence}
 #EXT-X-TARGETDURATION:3
 #EXT-X-DISCONTINUITY
-#EXTINF:-1,
+#EXTINF:2,
 ${fileUrl}`;
 };
 

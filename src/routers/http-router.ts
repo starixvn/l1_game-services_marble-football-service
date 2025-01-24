@@ -6,7 +6,7 @@ import { generateLoopFile, generatePlaylist, modifyM3U8 } from "../helpers/strea
 const MEDIA_SEQUENCE_MAX = 200;
 const STREAM_MIME_TYPE = "application/vnd.apple.mpegurl";
 const VIDEO_DEFAULT = "cd99ef2549fe8aa77a7c8c65485a7d9f615f7cc8ee8d0d944f6d98497633fe2c";
-let media_sequence = 0;
+let mediaSequenceFlag = true;
 
 export class HttpRouter extends TableHttpRouter {
     declare gameData: GameData;
@@ -39,15 +39,19 @@ export class HttpRouter extends TableHttpRouter {
             m3u8Content = await fetch(
                 new URL(`${this.gameData.result.firstHalfVideo}_${resolution}.m3u8`, this.appConfigs.liveStreamServer).toString()
             ).then((res) => res.text());
-            m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, media_sequence, timeToStart);
+            m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, 0, timeToStart);
         } else if (isSecondHalfVideo) {
             m3u8Content = await fetch(
                 new URL(`${this.gameData.result.secondHalfVideo}_${resolution}.m3u8`, this.appConfigs.liveStreamServer).toString()
             ).then((res) => res.text());
             timeToStart = durations.streamingVideo - 53 - remainingTime;
-            m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, media_sequence, timeToStart);
+            m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, 0, timeToStart);
         } else {
-            m3u8Content = generateLoopFile(this.appConfigs.liveStreamServer, `${VIDEO_DEFAULT}_${resolution}0.ts`, media_sequence++);
+            if (mediaSequenceFlag) {
+                m3u8Content = generatePlaylist();
+            } else {
+                m3u8Content = generateLoopFile(this.appConfigs.liveStreamServer, `${VIDEO_DEFAULT}_${resolution}0.ts`, 0);
+            }
         }
 
         res.setHeader("Content-Type", STREAM_MIME_TYPE);
