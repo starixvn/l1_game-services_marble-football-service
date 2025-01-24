@@ -16,7 +16,6 @@ export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: 
         if (lines[i].includes(KEY_FLAG_M3U8)) {
             configLines.push(`${KEY_FLAG_M3U8}:METHOD=AES-128,URI=${new URL("encryption.key", baseUrl).toString()}`);
         } else if (lines[i].includes(MEDIA_SEQUENCE_FLAG_M3U8)) {
-            configLines.push(`${MEDIA_SEQUENCE_FLAG_M3U8}:${mediaSequence}`);
         } else {
             configLines.push(lines[i]);
         }
@@ -24,15 +23,29 @@ export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: 
     configLines.push(`#EXT-X-START:TIME-OFFSET=${timeToStart}`);
     configLines.push(`#EXT-X-DISCONTINUITY`);
     const contentLines: string[] = [];
+    const segment: { duration: number; url: string }[] = [];
+    let durationSum = 0;
+    let chooseSegmentIndex = 0;
+    let flag = false;
     for (let i = contentIndex; i < lines.length; i += 2) {
         if (lines[i].includes(END_FLAG_M3U8)) {
             break;
         }
         contentLines.push(lines[i]);
         contentLines.push(new URL(lines[i + 1], baseUrl).toString());
+        segment.push({ duration: parseFloat(lines[i].split(":")[1]), url: new URL(lines[i + 1], baseUrl).toString() });
+        durationSum += parseFloat(lines[i].split(":")[1]);
+        if (durationSum >= timeToStart && !flag) {
+            chooseSegmentIndex = i;
+            flag = true;
+        }
     }
-
-    return [...configLines, ...contentLines].join("\n");
+    configLines.push(`#EXT-X-MEDIA-SEQUENCE:${chooseSegmentIndex}`);
+    const segmentToPlay = contentLines.slice(
+        chooseSegmentIndex,
+        chooseSegmentIndex + 6 > contentLines.length ? contentLines.length : chooseSegmentIndex + 6
+    );
+    return [...configLines, ...segmentToPlay].join("\n");
 };
 
 export const generateLoopFile = (baseUrl: string, fileName: string, mediaSequence: number) => {
