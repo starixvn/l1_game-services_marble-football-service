@@ -30,24 +30,21 @@ export class HttpRouter extends TableHttpRouter {
     async handleLiveStream(res: any, resolution: string = "720p") {
         const { remainingTime, roundId } = this.gameData;
         const { durations } = this.definition;
-        const mediaSequence = MEDIA_SEQUENCE_MAX - remainingTime;
-        const isStreamingVideo = remainingTime < durations.streamingVideo && remainingTime >= 0;
-        const isFirstHalfVideo = remainingTime < durations.streamingVideo && remainingTime >= durations.streamingVideo - 51;
+        const isFirstHalfVideo = remainingTime < durations.streamingVideo && remainingTime >= durations.streamingVideo - 50;
+        const isSecondHalfVideo = remainingTime < durations.streamingVideo - 53 && remainingTime > 0;
         let m3u8Content = "";
-        if (isStreamingVideo) {
-            let timeToStart = durations.streamingVideo - remainingTime;
-            if (isFirstHalfVideo) {
-                m3u8Content = await fetch(
-                    new URL(`${this.gameData.result.firstHalfVideo}_${resolution}.m3u8`, this.appConfigs.liveStreamServer).toString()
-                ).then((res) => res.text());
-                m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, roundId * 3 + 1, timeToStart);
-            } else {
-                m3u8Content = await fetch(
-                    new URL(`${this.gameData.result.secondHalfVideo}_${resolution}.m3u8`, this.appConfigs.liveStreamServer).toString()
-                ).then((res) => res.text());
-                timeToStart = durations.streamingVideo - 53 - remainingTime;
-                m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, roundId * 3 + 2, timeToStart);
-            }
+        let timeToStart = durations.streamingVideo - remainingTime;
+        if (isFirstHalfVideo) {
+            m3u8Content = await fetch(
+                new URL(`${this.gameData.result.firstHalfVideo}_${resolution}.m3u8`, this.appConfigs.liveStreamServer).toString()
+            ).then((res) => res.text());
+            m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, roundId * 3 + 1, timeToStart);
+        } else if (isSecondHalfVideo) {
+            m3u8Content = await fetch(
+                new URL(`${this.gameData.result.secondHalfVideo}_${resolution}.m3u8`, this.appConfigs.liveStreamServer).toString()
+            ).then((res) => res.text());
+            timeToStart = durations.streamingVideo - 53 - remainingTime;
+            m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, roundId * 3 + 2, timeToStart);
         } else {
             m3u8Content = generateLoopFile(this.appConfigs.liveStreamServer, `${VIDEO_DEFAULT}_${resolution}0.ts`, roundId * 3);
         }
