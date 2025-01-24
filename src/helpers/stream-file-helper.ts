@@ -20,7 +20,7 @@ export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: 
         }
     }
     configLines.push(`#EXT-X-START:TIME-OFFSET=${timeToStart}`);
-    configLines.push(`#EXT-X-INDEPENDENT-SEGMENTS`);
+    configLines.push(`#EXT-X-DISCONTINUITY`);
     const contentLines: string[] = [];
     for (let i = contentIndex; i < lines.length; i += 2) {
         if (lines[i].includes(END_FLAG_M3U8)) {
