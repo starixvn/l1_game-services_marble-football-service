@@ -2,6 +2,7 @@ const SEGMENT_FLAG_M3U8 = "#EXTINF";
 const MEDIA_SEQUENCE_FLAG_M3U8 = "#EXT-X-MEDIA-SEQUENCE";
 const KEY_FLAG_M3U8 = "#EXT-X-KEY";
 const END_FLAG_M3U8 = "#EXT-X-ENDLIST";
+const TARGET_DURATION_FLAG_M3U8 = "#EXT-X-TARGETDURATION";
 
 export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: number, timeToStart: number) => {
     const lines = m3u8Content.split("\n");
@@ -16,6 +17,8 @@ export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: 
             configLines.push(`${MEDIA_SEQUENCE_FLAG_M3U8}:${mediaSequence}`);
         } else if (lines[i].includes(KEY_FLAG_M3U8)) {
             configLines.push(`${KEY_FLAG_M3U8}:METHOD=AES-128,URI=${new URL("encryption.key", baseUrl).toString()}`);
+        } else if (lines[i].includes(KEY_FLAG_M3U8)) {
+            configLines.push(`${TARGET_DURATION_FLAG_M3U8}:50`);
         } else {
             configLines.push(lines[i]);
         }
@@ -37,4 +40,13 @@ export const generateLoopFile = (baseUrl: string, fileName: string, mediaSequenc
     const encryptionKey = new URL("encryption.key", baseUrl).toString();
     const fileUrl = new URL(fileName, baseUrl).toString();
     return `#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-MEDIA-SEQUENCE:${mediaSequence}\n#EXT-X-KEY:METHOD=AES-128,URI=${encryptionKey}\n#EXT-X-TARGETDURATION:11\n#EXTINF:\n${fileUrl}`;
+};
+
+export const generatePlaylist = () => {
+    return `#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-STREAM-INF:BANDWIDTH=744000
+stream_240p.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=3894000
+stream_720p.m3u8`;
 };
