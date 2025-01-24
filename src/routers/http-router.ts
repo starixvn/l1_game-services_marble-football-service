@@ -40,13 +40,14 @@ export class HttpRouter extends TableHttpRouter {
                 m3u8Content = await fetch(
                     new URL(`${this.gameData.result.firstHalfVideo}_${resolution}.m3u8`, this.appConfigs.liveStreamServer).toString()
                 ).then((res) => res.text());
+                m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, 1, timeToStart);
             } else {
                 m3u8Content = await fetch(
                     new URL(`${this.gameData.result.secondHalfVideo}_${resolution}.m3u8`, this.appConfigs.liveStreamServer).toString()
                 ).then((res) => res.text());
                 timeToStart = durations.streamingVideo - 53 - remainingTime;
+                m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, 2, timeToStart);
             }
-            m3u8Content = modifyM3U8(this.appConfigs.liveStreamServer, m3u8Content, mediaSequence, timeToStart);
         } else {
             m3u8Content = generateLoopFile(this.appConfigs.liveStreamServer, `${VIDEO_DEFAULT}_${resolution}0.ts`, mediaSequence);
         }

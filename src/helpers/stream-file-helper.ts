@@ -19,6 +19,7 @@ export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: 
             configLines.push(lines[i]);
         }
     }
+    configLines.push(`${MEDIA_SEQUENCE_FLAG_M3U8}:${mediaSequence}`);
     configLines.push(`#EXT-X-START:TIME-OFFSET=${timeToStart}`);
     configLines.push(`#EXT-X-DISCONTINUITY`);
     const contentLines: string[] = [];
