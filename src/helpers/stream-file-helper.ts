@@ -22,7 +22,6 @@ export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: 
     }
     configLines.push(`#EXT-X-START:TIME-OFFSET=${timeToStart}`);
     configLines.push(`#EXT-X-DISCONTINUITY`);
-    const contentLines: string[] = [];
     const segment: { duration: number; url: string }[] = [];
     let durationSum = 0;
     let chooseSegmentIndex = 0;
@@ -31,21 +30,19 @@ export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: 
         if (lines[i].includes(END_FLAG_M3U8)) {
             break;
         }
-        contentLines.push(lines[i]);
-        contentLines.push(new URL(lines[i + 1], baseUrl).toString());
         segment.push({ duration: parseFloat(lines[i].split(":")[1]), url: new URL(lines[i + 1], baseUrl).toString() });
         durationSum += parseFloat(lines[i].split(":")[1]);
         if (durationSum >= timeToStart && !flag) {
-            chooseSegmentIndex = i;
+            chooseSegmentIndex = segment.length - 1;
             flag = true;
         }
     }
     configLines.push(`#EXT-X-MEDIA-SEQUENCE:${chooseSegmentIndex}`);
-    const segmentToPlay = contentLines.slice(
+    const segmentToPlay = segment.slice(
         chooseSegmentIndex,
-        chooseSegmentIndex + 6 > contentLines.length ? contentLines.length : chooseSegmentIndex + 6
+        chooseSegmentIndex + 3 > segment.length ? segment.length : chooseSegmentIndex + 3
     );
-    return [...configLines, ...segmentToPlay].join("\n");
+    return [...configLines, ...segmentToPlay.map((item) => `#EXTINF:${item.duration},\n${item.url}`)].join("\n");
 };
 
 export const generateLoopFile = (baseUrl: string, fileName: string, mediaSequence: number) => {
