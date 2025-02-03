@@ -1,6 +1,7 @@
 import { TableGameData } from "sc-game-base/src/table";
 import { ResultType } from "./models/rounds";
 import { ITournament } from "./models/tournaments";
+import { Socket } from "socket.io";
 
 export default class GameData extends TableGameData {
     declare realPlayers: { [playerId: string]: RealPlayer };
@@ -14,6 +15,7 @@ export default class GameData extends TableGameData {
     liveStreamServer = "";
     tournament = {} as ITournament;
     publishedTournament = {} as ITournament;
+    streamClients: Record<string, Socket> = {};
 }
 
 export type RealPlayer = {

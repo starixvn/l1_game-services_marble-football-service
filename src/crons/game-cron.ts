@@ -8,11 +8,13 @@ import axios from "axios";
 import { retry } from "../helpers";
 import { generateVideoName } from "../helpers/result-helper";
 import defaultVideoTimelines from "../timelines/video-timelines";
+import { RunningRoundInfoPublisher } from "../publishers";
 
 export default class GameCron extends Table.Crons.TableGameCron {
     declare gameData: GameData;
     declare definition: GameDefinition;
     declare appConfigs: typeof AppConfigs;
+    declare runningRoundInfoPublisher: RunningRoundInfoPublisher;
 
     tournamentConsumer: TournamentConsumer;
 
@@ -106,6 +108,7 @@ export default class GameCron extends Table.Crons.TableGameCron {
         };
 
         this.runningRoundInfoPublisher.publishToAllUsers({ videoResult });
+        this.runningRoundInfoPublisher.publishToAllStreamClients({ videoResult });
     }
 
     async publishTournament() {
@@ -114,6 +117,7 @@ export default class GameCron extends Table.Crons.TableGameCron {
         this.gameData.publishedTournament = JSON.parse(JSON.stringify(tournament));
 
         this.runningRoundInfoPublisher.publishToAllUsers({ tournament });
+        this.runningRoundInfoPublisher.publishToAllStreamClients({ tournament });
     }
 
     override async proceed() {

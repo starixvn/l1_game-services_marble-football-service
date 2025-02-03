@@ -4,10 +4,18 @@ import GameData from "../game-data";
 import { getUserBetPercentage } from "../helpers/bet-percentage";
 
 export default class RunningRoundInfoPublisher extends RunningRoundInfoPublisherBase {
+    declare gameData: GameData;
     publish() {
         super.publish();
 
         this.publishBetPercentage();
+    }
+
+    publishToAllStreamClients(payload: any) {
+        const socketClients = Object.values(this.gameData.streamClients).filter((client) => client.connected);
+        socketClients.forEach((client) => {
+            client.emit("message", { [this.gameName]: payload });
+        });
     }
 
     publishBetPercentage() {
