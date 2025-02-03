@@ -46,6 +46,8 @@ export const modifyM3U8 = (baseUrl: string, m3u8Content: string, mediaSequence: 
     return [...configLines, ...segmentToPlay.map((item) => `#EXTINF:${item.duration},\n${item.url}`)].join("\n");
 };
 
+let DISCONTINUITY_SEQUENCE = 0;
+
 export const generateLoopFile = (baseUrl: string, fileName: string, mediaSequence: number) => {
     const encryptionKey = new URL("encryption.key", baseUrl).toString();
     const fileUrl = new URL(fileName, baseUrl).toString();
@@ -54,6 +56,8 @@ export const generateLoopFile = (baseUrl: string, fileName: string, mediaSequenc
 #EXT-X-KEY:METHOD=AES-128,URI=${encryptionKey}
 #EXT-X-MEDIA-SEQUENCE:${mediaSequence}
 #EXT-X-TARGETDURATION:3
+#EXT-X-DISCONTINUITY-SEQUENCE:${DISCONTINUITY_SEQUENCE++}
+#EXT-X-DISCONTINUITY
 #EXTINF:2,
 ${fileUrl}`;
 };
