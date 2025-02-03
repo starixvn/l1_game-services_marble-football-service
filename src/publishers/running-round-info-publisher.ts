@@ -14,7 +14,7 @@ export default class RunningRoundInfoPublisher extends RunningRoundInfoPublisher
     publishToAllStreamClients(payload: any) {
         const socketClients = Object.values(this.gameData.streamClients).filter((client) => client.connected);
         socketClients.forEach((client) => {
-            client.emit("message", { [this.gameName]: payload });
+            client.emit(this.gameName, payload);
         });
     }
 
