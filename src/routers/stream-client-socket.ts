@@ -22,6 +22,7 @@ export default class StreamClientSocket {
     handleJoin(data: any) {
         if (!this.socketClient) return;
         this.gameData.streamClients[this.socketClient.id] = this.socketClient;
+        const { remainingTime } = this.gameData;
         const liveStreamServer = this.gameData.liveStreamServer;
         const tournament = this.gameData.publishedTournament;
         const videoResult = this.getCurrentVideoResult();
@@ -29,6 +30,7 @@ export default class StreamClientSocket {
             liveStreamServer,
             tournament,
             videoResult,
+            remainingTime,
         });
     }
 
@@ -39,6 +41,8 @@ export default class StreamClientSocket {
 
         const isFirstHalf = remainingTime < durations.streamingVideo && remainingTime >= durations.streamingVideo - MATCH_VIDEO_RESULT_TIME;
         const isSecondHalf = remainingTime < durations.streamingVideo - MATCH_VIDEO_RESULT_TIME && remainingTime >= 0;
+
+        const timeOffset = this.gameData.remainingTime - durations.streamingVideo;
 
         const isShowingResult = remainingTime <= durations.wholeRound && remainingTime > durations.startingRound;
 
