@@ -31,6 +31,7 @@ export default class StreamClientSocket {
             tournament,
             videoResult,
             remainingTime,
+            roundId: this.gameData.roundId,
         });
     }
 
@@ -41,8 +42,6 @@ export default class StreamClientSocket {
 
         const isFirstHalf = remainingTime < durations.streamingVideo && remainingTime >= durations.streamingVideo - MATCH_VIDEO_RESULT_TIME;
         const isSecondHalf = remainingTime < durations.streamingVideo - MATCH_VIDEO_RESULT_TIME && remainingTime >= 0;
-
-        const timeOffset = this.gameData.remainingTime - durations.streamingVideo;
 
         const isShowingResult = remainingTime <= durations.wholeRound && remainingTime > durations.startingRound;
 
