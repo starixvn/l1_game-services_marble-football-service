@@ -125,6 +125,11 @@ export default class GameCron extends Table.Crons.TableGameCron {
 
         if (this.gameData.remainingTime === durations.wholeRound) {
             await this.checkGameStatus();
+            if (!this.gameData.disabled) {
+                this.runningRoundInfoPublisher.publishToAllStreamClients({
+                    remainingTime: this.gameData.remainingTime,
+                });
+            }
         }
 
         if (!this.gameData.disabled) {
@@ -134,6 +139,9 @@ export default class GameCron extends Table.Crons.TableGameCron {
         const remainingTime = this.gameData.remainingTime;
 
         if (remainingTime === durations.startingRound) {
+            this.runningRoundInfoPublisher.publishToAllStreamClients({
+                roundId: this.gameData.roundId,
+            });
             await this.publishTournament();
         }
 
