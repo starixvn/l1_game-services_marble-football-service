@@ -25,13 +25,14 @@ export default class StreamClientSocket {
         this.gameData.streamClients[this.socketClient.id] = this.socketClient;
         const { remainingTime, roundId, liveStreamServer, publishedTournament: tournament, result } = this.gameData;
         const videoResult = this.inGameConsumer.getCurrentVideoResult();
+        const matchResult = remainingTime <= 0 ? result : {};
         this.socketClient.emit(this.definition.name, {
             liveStreamServer,
             tournament,
             videoResult,
             remainingTime,
             roundId,
-            matchResult: result,
+            matchResult,
         });
     }
 }
