@@ -23,7 +23,7 @@ export default class StreamClientSocket {
     handleJoin(data: any) {
         if (!this.socketClient) return;
         this.gameData.streamClients[this.socketClient.id] = this.socketClient;
-        const { remainingTime, roundId, liveStreamServer, publishedTournament: tournament } = this.gameData;
+        const { remainingTime, roundId, liveStreamServer, publishedTournament: tournament, result } = this.gameData;
         const videoResult = this.inGameConsumer.getCurrentVideoResult();
         this.socketClient.emit(this.definition.name, {
             liveStreamServer,
@@ -31,6 +31,7 @@ export default class StreamClientSocket {
             videoResult,
             remainingTime,
             roundId,
+            matchResult: result,
         });
     }
 }

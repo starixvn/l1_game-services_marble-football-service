@@ -165,11 +165,16 @@ export default class GameCron extends Table.Crons.TableGameCron {
             this.publishVideoStream();
         }
 
+        if (remainingTime === 0) {
+            this.runningRoundInfoPublisher.publishToAllStreamClients({
+                matchResult: this.gameData.result,
+            });
+        }
+
         if (remainingTime < 0) {
             this.gameData.remainingTime = durations.wholeRound;
 
             await this.settleGameRoundConsumer.settleRound();
-            this.runningRoundInfoPublisher.publishToAllStreamClients({ tournament: this.gameData.publishedTournament });
         }
 
         if (this.isDuringBetTime(remainingTime)) {
