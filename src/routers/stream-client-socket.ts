@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import GameData from "../game-data";
-import GameDefinition from "../game-definition";
+import GameDefinition, { GameSettings } from "../game-definition";
 import { InGameConsumer } from "../consumers";
 
 export default class StreamClientSocket {
@@ -9,7 +9,16 @@ export default class StreamClientSocket {
     socketClient?: Socket;
     inGameConsumer: InGameConsumer;
 
-    constructor({ definition, gameData, inGameConsumer }: { definition: any; gameData: GameData; inGameConsumer: InGameConsumer }) {
+    constructor({
+        definition,
+        gameData,
+        inGameConsumer,
+    }: {
+        definition: any;
+        gameData: GameData;
+        inGameConsumer: InGameConsumer;
+        gameSettings: any;
+    }) {
         this.definition = definition;
         this.gameData = gameData;
         this.inGameConsumer = inGameConsumer;
@@ -23,9 +32,9 @@ export default class StreamClientSocket {
     handleJoin(data: any) {
         if (!this.socketClient) return;
         this.gameData.streamClients[this.socketClient.id] = this.socketClient;
-        const { remainingTime, roundId, liveStreamServer, publishedTournament: tournament, result } = this.gameData;
+        const { remainingTime, roundId, liveStreamServer, publishedTournament: tournament } = this.gameData;
         const videoResult = this.inGameConsumer.getCurrentVideoResult();
-        const matchResult = remainingTime <= 0 ? result : {};
+        const matchResult = remainingTime <= 0 || remainingTime >= this.definition.durations.startingRound ? this.gameData?.result : {};
         this.socketClient.emit(this.definition.name, {
             liveStreamServer,
             tournament,
