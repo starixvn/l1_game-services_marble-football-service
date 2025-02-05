@@ -42,7 +42,7 @@ const appConfigs = {
         id: "game-services",
         secret: "gameservices@20luminet&",
         requestTimeout: 10000,
-        useAuthenticate: false,
+        useAuthenticate: true,
         audiences: ["api", "admin-api"],
     },
     userServiceSettings: {
