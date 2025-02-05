@@ -1,17 +1,18 @@
 import { Socket } from "socket.io";
 import GameData from "../game-data";
 import GameDefinition from "../game-definition";
-
-const MATCH_VIDEO_RESULT_TIME = 51;
+import { InGameConsumer } from "../consumers";
 
 export default class StreamClientSocket {
     definition: GameDefinition;
     gameData: GameData;
     socketClient?: Socket;
+    inGameConsumer: InGameConsumer;
 
-    constructor({ definition, gameData }: { definition: any; gameData: GameData }) {
+    constructor({ definition, gameData, inGameConsumer }: { definition: any; gameData: GameData; inGameConsumer: InGameConsumer }) {
         this.definition = definition;
         this.gameData = gameData;
+        this.inGameConsumer = inGameConsumer;
     }
 
     init(socketClient: Socket) {
@@ -22,57 +23,14 @@ export default class StreamClientSocket {
     handleJoin(data: any) {
         if (!this.socketClient) return;
         this.gameData.streamClients[this.socketClient.id] = this.socketClient;
-        const { remainingTime } = this.gameData;
-        const liveStreamServer = this.gameData.liveStreamServer;
-        const tournament = this.gameData.publishedTournament;
-        const videoResult = this.getCurrentVideoResult();
+        const { remainingTime, roundId, liveStreamServer, publishedTournament: tournament } = this.gameData;
+        const videoResult = this.inGameConsumer.getCurrentVideoResult();
         this.socketClient.emit(this.definition.name, {
             liveStreamServer,
             tournament,
             videoResult,
             remainingTime,
-            roundId: this.gameData.roundId,
+            roundId,
         });
-    }
-
-    getCurrentVideoResult() {
-        const { durations } = this.definition;
-
-        const remainingTime = this.gameData.remainingTime;
-
-        const isFirstHalf = remainingTime < durations.streamingVideo && remainingTime >= durations.streamingVideo - MATCH_VIDEO_RESULT_TIME;
-        const isSecondHalf = remainingTime < durations.streamingVideo - MATCH_VIDEO_RESULT_TIME && remainingTime >= 0;
-
-        const isShowingResult = remainingTime <= durations.wholeRound && remainingTime > durations.startingRound;
-
-        if (isFirstHalf) {
-            return {
-                firstHalfVideo: this.gameData.result?.firstHalfVideo,
-                firstHalfTimeline: this.gameData.result?.firstHalfTimeline,
-                firstHalf: this.gameData.result?.firstHalf,
-            };
-        }
-
-        if (isSecondHalf) {
-            return {
-                firstHalfVideo: this.gameData.result?.firstHalfVideo,
-                secondHalfVideo: this.gameData.result?.secondHalfVideo,
-                firstHalfTimeline: this.gameData.result?.firstHalfTimeline,
-                secondHalfTimeline: this.gameData.result?.secondHalfTimeline,
-                firstHalf: this.gameData.result?.firstHalf,
-                secondHalf: this.gameData.result?.secondHalf,
-            };
-        }
-
-        if (isShowingResult) {
-            return {
-                firstHalfTimeline: this.gameData.result?.firstHalfTimeline,
-                secondHalfTimeline: this.gameData.result?.secondHalfTimeline,
-                firstHalf: this.gameData.result?.firstHalf,
-                secondHalf: this.gameData.result?.secondHalf,
-            };
-        }
-
-        return {};
     }
 }
