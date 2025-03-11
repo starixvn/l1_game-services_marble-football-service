@@ -2,8 +2,8 @@ export default {
     hostingPort: 5000,
     apiSettings: {
         enabledApi: true,
-        apiUrl: "http://l2_game_api_local_1:5000",
-        authUrl: "http://l2_auth_api_local_1:5000",
+        apiUrl: "http://l2-game-api-local1-service:5000",
+        authUrl: "http://l2-auth-api-local1-service:5000",
         client: {
             id: "game-server",
             secret: "gameserver@20luminet&",
@@ -11,6 +11,7 @@ export default {
         useAuthenticate: true,
         requestTimeout: 5000,
         placeBetTimeout: 2000,
+
         enabledApiLogs: true,
     },
     socketOptions: {
@@ -38,7 +39,7 @@ export default {
         env: "LOCAL1",
     },
     authenticateSettings: {
-        url: "http://l2_auth_api_local_1:5000",
+        url: "http://l2-auth-api-local1-service:5000",
         id: "game-services",
         secret: "gameservices@20luminet&",
         requestTimeout: 10000,
@@ -46,7 +47,7 @@ export default {
         audiences: ["api", "admin-api"],
     },
     userServiceSettings: {
-        url: "http://l2_user_service_local_1:5000",
+        url: "http://l2-user-service-local1-service:5000",
     },
     adminSecretKey: "asWDEerfOIdgsdqRTFabvmgh",
     metrics: {
@@ -55,9 +56,8 @@ export default {
     },
     enableMsgpackParser: false,
     gameManagementApiSettings: {
-        BASE: "http://l2_game_management_service_local_1:5000",
+        BASE: "http://l2-game-management-service-local1-service:5000",
     },
-
     disableCors: true,
     otel: {
         system: "VG2",
@@ -67,7 +67,7 @@ export default {
 
     liveStreamServer: "https://d1aof1lwumql9k.cloudfront.net/104_STAGING/",
     gameResultSettings: {
-        baseUrl: "http://l2_game_result_local_1:5000",
+        baseUrl: "http://l2-game-result-local1-service:5000",
         id: "Game Service",
         key: "b396d3e4-c81d-4c5c-8100-94a8b330f12a",
     },
