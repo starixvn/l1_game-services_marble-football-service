@@ -74,6 +74,6 @@ export default {
     },
     proxyServer: {
         enabled: true,
-        url: "http://iiiusqd.gamora.prod:8801",
+        url: "http://iusqd.gamora.prod:8801",
     },
 };
